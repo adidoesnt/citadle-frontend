@@ -44,11 +44,13 @@ function GameGrid({ length, word }: GameGridProps) {
               ? "bg-none"
               : element.guess === element.letter
               ? "bg-green-500"
+              : word.includes(element.guess.toLowerCase())
+              ? "bg-yellow-500"
               : "bg-red-500";
           return (
             <div
               key={index}
-              className={`border border-white flex items-center justify-center rounded-sm aspect-square ${color}`}
+              className={`border border-white flex items-center justify-center rounded-sm aspect-square ${color} font-bold text-lg`}
             >
               {element.guess ?? "-"}
             </div>
