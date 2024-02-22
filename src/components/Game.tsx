@@ -9,6 +9,7 @@ function GameGrid({ length, word }: GameGridProps) {
   const cols = `grid-cols-${length}`;
   const [input, setInput] = useState("");
   const [guesses, setGuesses] = useState(0);
+  const [wordGuessed, setWordGuessed] = useState(false);
   const [gameState, setGameState] = useState(
     Array.from({ length: length * length }).map((_, index) => ({
       guess: null as string | null,
@@ -22,7 +23,7 @@ function GameGrid({ length, word }: GameGridProps) {
     setInput(value.toUpperCase());
   };
 
-  const handleGuess = () => {
+  const handleGuess = async () => {
     setGuesses((prevGuess) => prevGuess + 1);
     const lettersGuessed = (guesses + 1) * length;
     const newGameState = gameState.map((element, index) => {
@@ -33,6 +34,9 @@ function GameGrid({ length, word }: GameGridProps) {
     });
     setGameState(newGameState);
     setInput("");
+    if (input === word.toUpperCase()) {
+      setWordGuessed(true);
+    }
   };
 
   return (
@@ -58,7 +62,7 @@ function GameGrid({ length, word }: GameGridProps) {
         })}
       </div>
       <br />
-      {guesses < length && (
+      {guesses < length && !wordGuessed && (
         <div className="w-full flex justify-center">
           <input
             className="p-3 text-center rounded-md text-lg uppercase"
@@ -72,6 +76,20 @@ function GameGrid({ length, word }: GameGridProps) {
           >
             Guess
           </button>
+        </div>
+      )}
+      {wordGuessed && (
+        <div>
+          <p className="w-full flex text-center justify-center p-3">
+            You guessed the city!
+          </p>
+        </div>
+      )}
+      {guesses >= length && (
+        <div>
+          <p className="w-full flex text-center justify-center p-3">
+            Better luck next time.
+          </p>
         </div>
       )}
       <div>
