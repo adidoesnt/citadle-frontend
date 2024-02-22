@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+const { VITE_API_URL: apiUrl = "", VITE_API_KEY: apiKey = "" } = import.meta
+  .env;
 
 type GameGridProps = {
   length: number;
   word: string;
 };
 
+const gridColsConfig = [
+  "grid-cols-1",
+  "grid-cols-2",
+  "grid-cols-3",
+  "grid-cols-4",
+  "grid-cols-5",
+  "grid-cols-6",
+  "grid-cols-7",
+  "grid-cols-8",
+];
+
 function GameGrid({ length, word }: GameGridProps) {
-  const cols = `grid-cols-${length}`;
+  const cols = gridColsConfig[length - 1];
   const [input, setInput] = useState("");
   const [guesses, setGuesses] = useState(0);
   const [wordGuessed, setWordGuessed] = useState(false);
@@ -24,6 +39,7 @@ function GameGrid({ length, word }: GameGridProps) {
   };
 
   const handleGuess = async () => {
+    if (input.length !== length) return;
     setGuesses((prevGuess) => prevGuess + 1);
     const lettersGuessed = (guesses + 1) * length;
     const newGameState = gameState.map((element, index) => {
@@ -102,9 +118,47 @@ function GameGrid({ length, word }: GameGridProps) {
 }
 
 export default function Game() {
+  const fetchWord = useCallback(async function () {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "X-Api-Key": apiKey,
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await res.json();
+    return data;
+  }, []);
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ["word"],
+    queryFn: fetchWord,
+  });
+
+  if (isPending) {
+    return (
+      <div>
+        <p className="w-full flex text-center justify-center p-3">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <p className="w-full flex text-center justify-center p-3">
+          Error: {error.message}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full p-5">
-      <GameGrid length={5} word={"delhi"} />
-    </div>
+    data.city && (
+      <div className="w-full p-5">
+        <GameGrid length={data.city.length} word={data.city} />
+      </div>
+    )
   );
 }
