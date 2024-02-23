@@ -84,7 +84,7 @@ function GameGrid({ length, word }: GameGridProps) {
       {guesses < length && !wordGuessed && (
         <div className="w-full flex justify-center">
           <input
-            className="p-3 text-center rounded-md text-lg uppercase"
+            className="p-3 text-center rounded-md text-lg uppercase bg-[#3b3b3b]"
             type="text"
             value={input}
             onChange={handleInputChange}
