@@ -61,7 +61,7 @@ function GameGrid({ length, word }: GameGridProps) {
       );
     }
     return rows.join("\n");
-  }, [gameState, word]);
+  }, [gameState, word, guesses]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
