@@ -44,7 +44,7 @@ function GameGrid({ length, word }: GameGridProps) {
       close: "🟨",
     };
     const rows = [];
-    for (let i = 0; i < Math.sqrt(gameState.length); i++) {
+    for (let i = 0; i < guesses; i++) {
       const row = gameState.slice(
         i * Math.sqrt(gameState.length),
         (i + 1) * Math.sqrt(gameState.length)
