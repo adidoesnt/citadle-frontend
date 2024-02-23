@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-const { VITE_NODE_ENV = "PROD", VITE_API_URL = '' } = import.meta.env;
+const { VITE_NODE_ENV = "PROD", VITE_API_URL = "" } = import.meta.env;
 const apiUrl =
   VITE_NODE_ENV === "DEV"
     ? VITE_API_URL
@@ -24,8 +24,10 @@ const gridColsConfig = [
 ];
 
 function GameGrid({ length, word }: GameGridProps) {
+  const date = useMemo(() => new Date(), []);
   const cols = gridColsConfig[length - 1];
   const [input, setInput] = useState("");
+  const [copied, setCopied] = useState(false);
   const [guesses, setGuesses] = useState(0);
   const [wordGuessed, setWordGuessed] = useState(false);
   const [gameState, setGameState] = useState(
@@ -34,6 +36,32 @@ function GameGrid({ length, word }: GameGridProps) {
       letter: word[index % length].toUpperCase(),
     }))
   );
+
+  const gameStateToEmoji = useCallback(() => {
+    const emojiMap = {
+      correct: "🟩",
+      incorrect: "🟥",
+      close: "🟨",
+    };
+    const rows = [];
+    for (let i = 0; i < Math.sqrt(gameState.length); i++) {
+      const row = gameState.slice(
+        i * Math.sqrt(gameState.length),
+        (i + 1) * Math.sqrt(gameState.length)
+      );
+      rows.push(
+        row
+          .map((cell) => {
+            if (cell.guess === null) return;
+            if (cell.guess === cell.letter) return emojiMap.correct;
+            if (word.includes(cell.guess.toLowerCase())) return emojiMap.close;
+            return emojiMap.incorrect;
+          })
+          .join("")
+      );
+    }
+    return rows.join("\n");
+  }, [gameState, word]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -58,8 +86,25 @@ function GameGrid({ length, word }: GameGridProps) {
     }
   };
 
+  const handleShare = () => {
+    const data = gameStateToEmoji();
+    const formattedDate = date.toLocaleDateString().split("T")[0];
+    const result = `Citadle - ${formattedDate}\n\n${guesses}/${length} guesses\n\n${data}`;
+    navigator.clipboard.writeText(result).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    });
+  };
+
   return (
     <>
+      {copied && (
+        <div>
+          <p className="w-full flex text-center justify-center p-3">
+            Result copied to clipboard!
+          </p>
+        </div>
+      )}
       <div id="game-grid" className={`grid ${cols} gap-2`}>
         {gameState.map((element, index) => {
           const color =
@@ -98,10 +143,16 @@ function GameGrid({ length, word }: GameGridProps) {
         </div>
       )}
       {wordGuessed && (
-        <div>
-          <p className="w-full flex text-center justify-center p-3">
+        <div className="flex w-full justify-center">
+          <p className="flex text-center justify-center p-3">
             You guessed the city!
           </p>
+          <button
+            className="p-3 bg-blue-500 text-white rounded-md ml-3"
+            onClick={handleShare}
+          >
+            Share
+          </button>
         </div>
       )}
       {guesses >= length && (
