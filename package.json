@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start": "bun run server.ts",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "containerise": "docker build -t citadle-frontend:latest .",
+    "local": "docker run --rm -p 3000:3000 --env-file .env citadle-frontend:latest"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.22.2",
