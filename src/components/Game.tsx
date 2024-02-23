@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-const { VITE_NODE_ENV = 'PROD' } = process.env;
+const { VITE_NODE_ENV = "PROD", VITE_API_URL = '' } = import.meta.env;
 const apiUrl =
   VITE_NODE_ENV === "DEV"
-    ? "http://localhost:3001/city"
+    ? VITE_API_URL
     : "https://citadle-backend-c0afcab83640.herokuapp.com/city";
 
 type GameGridProps = {
