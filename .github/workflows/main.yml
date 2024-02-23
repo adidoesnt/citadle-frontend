@@ -43,9 +43,6 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t registry.heroku.com/citadle-frontend/web .
-        env:
-          VITE_API_URL: ${{ secrets.API_URL }}
-          VITE_API_KEY: ${{ secrets.API_KEY }}
 
       - name: Push Docker image to Heroku container registry
         run: docker push registry.heroku.com/citadle-frontend/web
@@ -54,7 +51,6 @@ jobs:
         run: |
           heroku config:set \
           VITE_API_URL=${{ secrets.API_URL }} \
-          VITE_API_KEY=${{ secrets.API_KEY }} \
           --app citadle-frontend
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}

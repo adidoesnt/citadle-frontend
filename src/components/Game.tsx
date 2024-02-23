@@ -1,8 +1,11 @@
 import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-const { VITE_API_URL: apiUrl = "", VITE_API_KEY: apiKey = "" } = import.meta
-  .env;
+const { VITE_NODE_ENV = 'PROD' } = process.env;
+const apiUrl =
+  VITE_NODE_ENV === "DEV"
+    ? "http://localhost:3001/city"
+    : "https://citadle-backend-c0afcab83640.herokuapp.com/city";
 
 type GameGridProps = {
   length: number;
@@ -119,11 +122,7 @@ function GameGrid({ length, word }: GameGridProps) {
 
 export default function Game() {
   const fetchWord = useCallback(async function () {
-    const res = await fetch(apiUrl, {
-      headers: {
-        "X-Api-Key": apiKey,
-      },
-    });
+    const res = await fetch(apiUrl);
     if (!res.ok) {
       throw new Error("Network response was not ok");
     }
